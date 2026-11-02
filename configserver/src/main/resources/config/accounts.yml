@@ -1,0 +1,11 @@
+build:
+  version: "3.0"
+
+accounts:
+  message: "Welcome to SmartBank accounts related local APIs (Default)"
+  contactDetails:
+    name: "Prem Kapadne - Developer"
+    email: "prem@smartbank.com"
+  onCallSupport:
+    - (555) 555-1234
+    - (555) 523-1345

@@ -1,0 +1,11 @@
+build:
+  version: "2.0"
+
+loans:
+  message: "Welcome to SmartBank loans related QA APIs (QA)"
+  contactDetails:
+    name: "Pranav Patil - QA Lead"
+    email: "pranav@smartbank.com"
+  onCallSupport:
+    - (785) 545-6565
+    - (853) 546-3467

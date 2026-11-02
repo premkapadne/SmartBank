@@ -1,0 +1,11 @@
+build:
+  version: "3.0"
+
+loans:
+  message: "Welcome to SmartBank loans related local APIs (Default)"
+  contactDetails:
+    name: "Neha Patil - Developer"
+    email: "neha@smartbank.com"
+  onCallSupport:
+    - (452) 456-2176
+    - (546) 764-8934

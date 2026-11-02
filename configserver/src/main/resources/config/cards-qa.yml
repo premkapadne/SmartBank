@@ -1,0 +1,11 @@
+build:
+  version: "2.0"
+
+cards:
+  message: "Welcome to SmartBank cards related QA APIs (QA)"
+  contactDetails:
+    name: "Jerry Mark - QA Lead"
+    email: "Jerry@smartbank.com"
+  onCallSupport:
+    - (310) 875-4367
+    - (201) 236-1267

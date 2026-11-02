@@ -1,0 +1,11 @@
+build:
+  version: "1.0"
+
+loans:
+  message: "Welcome to SmartBank loans related prod APIs (Production)"
+  contactDetails:
+    name: "Rushabh Kotecha - Product Owner"
+    email: "rushabh@smartbank.com"
+  onCallSupport:
+    - (723) 656-8709
+    - (156) 342-0956
