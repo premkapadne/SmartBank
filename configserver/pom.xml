@@ -11,8 +11,8 @@
 	<groupId>com.smartbank</groupId>
 	<artifactId>configserver</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<packaging>jar</packaging>
+	<description>ConfigServer for Configuration Management</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -69,6 +69,13 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+
+				<configuration>
+					<image>
+						<name>starxcoder/${project.artifactId}:v2-base</name>
+						<builder>paketobuildpacks/builder-jammy-full</builder>
+					</image>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
