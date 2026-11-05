@@ -1,6 +1,8 @@
 package com.banks.accounts;
 
 import com.banks.accounts.dto.AccountsContactInfoDto;
+import com.banks.accounts.service.client.CardsClient;
+import com.banks.accounts.service.client.LoansClient;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
@@ -11,8 +13,11 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.web.service.registry.ImportHttpServices;
 
 @SpringBootApplication
+@ImportHttpServices(group = "loans",types = LoansClient.class)
+@ImportHttpServices(group = "cards",types = CardsClient.class)
 /*@ComponentScans({ @ComponentScan("com.banks.accounts.controller") })
 @EnableJpaRepositories("com.banks.accounts.repository")
 @EntityScan("com.banks.accounts.model")*/
