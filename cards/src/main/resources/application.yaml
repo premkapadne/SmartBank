@@ -49,3 +49,7 @@ info:
     description: "Smart Bank Cards Application"
     version: "1.0.0"
 
+logging:
+  pattern:
+    console: ${CONSOLE_LOG_PATTERN:%green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) - %cyan(%msg%n)}
+
