@@ -53,7 +53,7 @@ services:
       service: network-deploy-service
 
   configserver:
-    image: "starxcoder/configserver:v2"
+    image: "starxcoder/configserver:v3"
     container_name: configserver-ms
     ports:
       - "8071:8071"
@@ -74,102 +74,160 @@ services:
       service: microservice-base-config
 
   eurekaserver:
-    image: "starxcoder/eurekaserver:v1"
+    image: "starxcoder/eurekaserver:v2"
     container_name: eurekaserver-ms
     ports:
       - "8070:8070"
     depends_on:
       configserver:
         condition: service_healthy
-    healthcheck:
-      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
     extends:
       file: common-config.yml
       service: microservice-configserver-config
     environment:
       SPRING_APPLICATION_NAME: "eurekaserver"
+      BPL_JVM_THREAD_COUNT: "50"
+
+  eurekaserver-hc:
+    image: curlimages/curl:8.12.1
+    network_mode: "service:eurekaserver"
+    entrypoint: ["sleep", "infinity"]
+    depends_on:
+      eurekaserver:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8070/actuator/health/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 60s
 
   accounts:
-    image: "starxcoder/accounts:v3"
+    image: "starxcoder/accounts:v4"
     container_name: accounts-ms
     ports:
       - "8080:8080"
-
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-
     depends_on:
       accountsdb:
         condition: service_healthy
       configserver:
         condition: service_healthy
-
-    environment:
-      SPRING_APPLICATION_NAME: "accounts"
-      SPRING_DATASOURCE_URL: "jdbc:mysql://accountsdb:3306/accountsdb"
-
-      BPL_JVM_THREAD_COUNT: "50"
-
-    extends:
-      file: common-config.yml
-      service: microservice-configserver-config
-
-  loans:
-    image: "starxcoder/loans:v2"
-    container_name: loans-ms
-    ports:
-      - "8090:8090"
-
+      eurekaserver-hc:
+        condition: service_healthy
     deploy:
       resources:
         limits:
           memory: 1G
+    environment:
+      SPRING_APPLICATION_NAME: "accounts"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://accountsdb:3306/accountsdb"
+      BPL_JVM_THREAD_COUNT: "50"
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
 
+  accounts-hc:
+    image: curlimages/curl:8.12.1
+    network_mode: "service:accounts"
+    entrypoint: ["sleep", "infinity"]
+    depends_on:
+      accounts:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/actuator/health/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 60s
+
+  loans:
+    image: "starxcoder/loans:v3"
+    container_name: loans-ms
+    ports:
+      - "8090:8090"
     depends_on:
       loansdb:
         condition: service_healthy
       configserver:
         condition: service_healthy
-
-    environment:
-      SPRING_APPLICATION_NAME: "loans"
-      SPRING_DATASOURCE_URL: "jdbc:mysql://loansdb:3306/loansdb"
-
-      BPL_JVM_THREAD_COUNT: "50"
-
-    extends:
-      file: common-config.yml
-      service: microservice-configserver-config
-
-  cards:
-    image: "starxcoder/cards:v2"
-    container_name: cards-ms
-    ports:
-      - "9000:9000"
-
+      eurekaserver-hc:
+        condition: service_healthy
     deploy:
       resources:
         limits:
           memory: 1G
+    environment:
+      SPRING_APPLICATION_NAME: "loans"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://loansdb:3306/loansdb"
+      BPL_JVM_THREAD_COUNT: "50"
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
 
+  loans-hc:
+    image: curlimages/curl:8.12.1
+    network_mode: "service:loans"
+    entrypoint: ["sleep", "infinity"]
+    depends_on:
+      loans:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8090/actuator/health/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 60s
+
+  cards:
+    image: "starxcoder/cards:v3"
+    container_name: cards-ms
+    ports:
+      - "9000:9000"
     depends_on:
       cardsdb:
         condition: service_healthy
       configserver:
         condition: service_healthy
-
+      eurekaserver-hc:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1G
     environment:
       SPRING_APPLICATION_NAME: "cards"
       SPRING_DATASOURCE_URL: "jdbc:mysql://cardsdb:3306/cardsdb"
-
       BPL_JVM_THREAD_COUNT: "50"
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
 
+  cards-hc:
+    image: curlimages/curl:8.12.1
+    network_mode: "service:cards"
+    entrypoint: ["sleep", "infinity"]
+    depends_on:
+      cards:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:9000/actuator/health/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 60s
+
+  gatewayserver:
+    image: "starxcoder/gatewayserver:v1"
+    container_name: gatewayserver-ms
+    ports:
+      - "8072:8072"
+    depends_on:
+      accounts-hc:
+        condition: service_healthy
+      loans-hc:
+        condition: service_healthy
+      cards-hc:
+        condition: service_healthy
     extends:
       file: common-config.yml
       service: microservice-configserver-config

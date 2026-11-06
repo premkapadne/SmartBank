@@ -27,9 +27,17 @@ management:
     web:
       exposure:
         include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
   endpoint:
     shutdown:
       access: unrestricted
+    health:
+      probes:
+        enabled: true
     info:
       env:
         enabled: true
@@ -52,4 +60,7 @@ info:
 logging:
   pattern:
     console: ${CONSOLE_LOG_PATTERN:%green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) - %cyan(%msg%n)}
-
+  level:
+    com:
+      banks:
+        cards: DEBUG

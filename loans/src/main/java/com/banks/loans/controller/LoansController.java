@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -33,20 +35,20 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class LoansController {
 
+    private static final Logger logger = LoggerFactory.getLogger(LoansController.class);
     private ILoansService iLoansService;
+    private Environment environment;
+    private LoansContactInfoDto loansContactInfoDto;
 
-    public LoansController(ILoansService iLoansService) {
+    public LoansController(ILoansService iLoansService, Environment environment,
+                           LoansContactInfoDto loansContactInfoDto) {
         this.iLoansService = iLoansService;
+        this.environment = environment;
+        this.loansContactInfoDto = loansContactInfoDto;
     }
 
     @Value("${build.version}")
     private String buildVersion;
-
-    @Autowired
-    private Environment environment;
-
-    @Autowired
-    private LoansContactInfoDto loansContactInfoDto;
 
     @Operation(
             summary = "Create Loan REST API",
@@ -95,12 +97,14 @@ public class LoansController {
     }
     )
     @GetMapping("/fetch")
-    public ResponseEntity<LoansDto> fetchLoanDetails(@RequestParam
-                                                     @Pattern(regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
+    public ResponseEntity<LoansDto> fetchLoanDetails(@RequestHeader("smartbank-correlation-id")
+                                                     String correlationId, @RequestParam @Pattern(regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
                                                      String mobileNumber) {
+        logger.debug("smartbank-correlation-id found: {} ", correlationId);
         LoansDto loansDto = iLoansService.fetchLoan(mobileNumber);
         return ResponseEntity.status(HttpStatus.OK).body(loansDto);
     }
+
 
     @Operation(
             summary = "Update Loan Details REST API",

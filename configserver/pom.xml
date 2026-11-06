@@ -72,7 +72,7 @@
 
 				<configuration>
 					<image>
-						<name>starxcoder/${project.artifactId}:v2-base</name>
+						<name>starxcoder/${project.artifactId}:v3</name>
 						<builder>paketobuildpacks/builder-jammy-full</builder>
 					</image>
 				</configuration>
