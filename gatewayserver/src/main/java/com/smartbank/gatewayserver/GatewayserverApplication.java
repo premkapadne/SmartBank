@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.web.reactive.function.server.RouterFunctions.route;
+
 @SpringBootApplication
 public class GatewayserverApplication {
 
@@ -19,10 +21,11 @@ public class GatewayserverApplication {
 	public RouteLocator smartBankRouteConfig(RouteLocatorBuilder routeLocatorBuilder) {
 		return routeLocatorBuilder.routes()
 				.route(p -> p.path("/smartbank/accounts/**")
-								.filters(f -> f.rewritePath("/smartbank/accounts/(?<segment>.*)","/${segment}")
+						.filters(f -> f.rewritePath("/smartbank/accounts/(?<segment>.*)","/${segment}")
 								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
-								.circuitBreaker(config -> config.setName("accountsCircuitBreaker")))
-								.uri("lb://ACCOUNTS"))
+								.circuitBreaker(config -> config.setName("accountsCircuitBreaker")
+										.setFallbackUri("forward:/contactSupport")))
+						.uri("lb://ACCOUNTS"))
 				.route(p -> p.path("/smartbank/loans/**")
 								.filters(f -> f.rewritePath("/smartbank/loans/(?<segment>.*)","/${segment}")
 								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
