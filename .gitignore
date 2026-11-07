@@ -16,7 +16,7 @@
 .idea/
 
 # Docker database volumes
-smartbank/
+/smartbank/
 
 # Environment files
 .env
