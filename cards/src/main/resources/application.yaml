@@ -64,3 +64,9 @@ logging:
     com:
       banks:
         cards: DEBUG
+
+resilience4j.bulkhead:
+  configs:
+    default:
+      maxConcurrentCalls: 2
+      maxWaitDuration: 1
