@@ -137,7 +137,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<image>
-						<name>starxcoder/${project.artifactId}:v3</name>
+						<name>starxcoder/${project.artifactId}:v5</name>
 					</image>
 				</configuration>
 			</plugin>
