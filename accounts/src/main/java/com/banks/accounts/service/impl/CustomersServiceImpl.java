@@ -15,6 +15,8 @@ import com.banks.accounts.service.ICustomersService;
 import com.banks.accounts.service.client.CardsClient;
 import com.banks.accounts.service.client.LoansClient;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CustomersServiceImpl implements ICustomersService {
 
+    private static final Logger logger = LoggerFactory.getLogger(CustomersServiceImpl.class);
     private AccountsRepository accountsRepository;
     private CustomerRepository customerRepository;
     private CardsClient cardsClient;
@@ -29,7 +32,8 @@ public class CustomersServiceImpl implements ICustomersService {
 
 
     @Override
-    public CustomerDetailsDto fetchCustomerDetails(String mobileNumber, String correlationId) {
+    public CustomerDetailsDto fetchCustomerDetails(String mobileNumber) {
+        logger.debug("Looking up customer by mobileNumber: {}", mobileNumber);
         Customer customer = customerRepository.findByMobileNumber(mobileNumber).orElseThrow(
                 () -> new ResourceNotFoundException("Customer", "mobileNumber", mobileNumber)
         );
@@ -40,15 +44,21 @@ public class CustomersServiceImpl implements ICustomersService {
         CustomerDetailsDto customerDetailsDto = CustomerMapper.mapToCustomerDetailsDto(customer, new CustomerDetailsDto());
         customerDetailsDto.setAccountsDto(AccountsMapper.mapToAccountsDto(accounts, new AccountsDto()));
 
-        ResponseEntity<LoansDto> loansDtoResponseEntity = loansClient.fetchLoanDetails(correlationId,mobileNumber);
-        if(loansDtoResponseEntity != null) {
+        logger.debug("Calling loans service for mobileNumber: {}", mobileNumber);
+        ResponseEntity<LoansDto> loansDtoResponseEntity = loansClient.fetchLoanDetails(mobileNumber);
+        if(null != loansDtoResponseEntity) {
             customerDetailsDto.setLoansDto(loansDtoResponseEntity.getBody());
-        }
-        ResponseEntity<CardsDto> cardsDtoResponseEntity = cardsClient.fetchCardDetails(correlationId,mobileNumber);
-        if (cardsDtoResponseEntity != null) {
-            customerDetailsDto.setCardsDto(cardsDtoResponseEntity.getBody());
+        } else {
+            logger.warn("Loans service call failed or fell back for mobileNumber: {}", mobileNumber);
         }
 
+        logger.debug("Calling cards service for mobileNumber: {}", mobileNumber);
+        ResponseEntity<CardsDto> cardsDtoResponseEntity = cardsClient.fetchCardDetails(mobileNumber);
+        if(null != cardsDtoResponseEntity) {
+            customerDetailsDto.setCardsDto(cardsDtoResponseEntity.getBody());
+        } else {
+            logger.warn("Cards service call failed or fell back for mobileNumber: {}", mobileNumber);
+        }
         return customerDetailsDto;
 
     }

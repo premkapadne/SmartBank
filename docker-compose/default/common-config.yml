@@ -19,6 +19,7 @@ services:
   microservice-base-config:
     extends:
       service: network-deploy-service
+    restart: unless-stopped
     deploy:
       resources:
         limits:
@@ -26,6 +27,9 @@ services:
     environment:
       SPRING_RABBITMQ_HOST: "rabbit"
       MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT: http://grafana-lgtm:4318/v1/traces
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://grafana-lgtm:4318/v1/logs
+      MANAGEMENT_OTLP_METRICS_EXPORT_URL: http://grafana-lgtm:4318/v1/metrics
 
   microservice-configserver-config:
     extends:

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @HttpServiceFallback(value = CardsFallback.class, group = "cards")
 public class CardsFallback {
 
-    public ResponseEntity<CardsDto> fetchCardDetails(String correlationId, String mobileNumber) {
+    public ResponseEntity<CardsDto> fetchCardDetails(String mobileNumber) {
         return null;
     }
 }

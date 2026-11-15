@@ -52,14 +52,12 @@ public class CustomerController {
     }
     )
     @GetMapping("/fetchCustomerDetails")
-    public ResponseEntity<CustomerDetailsDto> fetchCustomerDetails(
-            @RequestHeader("smartbank-correlation-id") String correlationId, @RequestParam
-            @Pattern(regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
-            String mobileNumber)
-    {
-        logger.debug("smartbank-correlation-id found: {} ", correlationId);
-        CustomerDetailsDto customerDetailsDto = iCustomersService.fetchCustomerDetails(mobileNumber,correlationId);
+    public ResponseEntity<CustomerDetailsDto> fetchCustomerDetails(@RequestParam
+                                                                   @Pattern(regexp = "(^$|[0-9]{10})", message = "Mobile number must be 10 digits")
+                                                                   String mobileNumber) {
+        logger.info("Fetching customer details for mobileNumber: {}", mobileNumber);
+        CustomerDetailsDto customerDetailsDto = iCustomersService.fetchCustomerDetails(mobileNumber);
+        logger.info("Successfully fetched customer details for mobileNumber: {}", mobileNumber);
         return ResponseEntity.status(HttpStatus.SC_OK).body(customerDetailsDto);
     }
-
 }

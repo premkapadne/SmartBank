@@ -72,7 +72,9 @@ public class LoansController {
     public ResponseEntity<ResponseDto> createLoan(@RequestParam
                                                   @Pattern(regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
                                                   String mobileNumber) {
+        logger.info("Creating loan for mobileNumber: {}", mobileNumber);
         iLoansService.createLoan(mobileNumber);
+        logger.info("Successfully created loan for mobileNumber: {}", mobileNumber);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDto(LoansConstants.STATUS_201, LoansConstants.MESSAGE_201));
@@ -97,11 +99,11 @@ public class LoansController {
     }
     )
     @GetMapping("/fetch")
-    public ResponseEntity<LoansDto> fetchLoanDetails(@RequestHeader("smartbank-correlation-id")
-                                                     String correlationId, @RequestParam @Pattern(regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
+    public ResponseEntity<LoansDto> fetchLoanDetails(@RequestParam @Pattern(regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
                                                      String mobileNumber) {
-        logger.debug("smartbank-correlation-id found: {} ", correlationId);
+        logger.info("Fetching loan details for mobileNumber: {}", mobileNumber);
         LoansDto loansDto = iLoansService.fetchLoan(mobileNumber);
+        logger.info("Successfully fetched loan details for mobileNumber: {}", mobileNumber);
         return ResponseEntity.status(HttpStatus.OK).body(loansDto);
     }
 
@@ -130,12 +132,15 @@ public class LoansController {
     )
     @PutMapping("/update")
     public ResponseEntity<ResponseDto> updateLoanDetails(@Valid @RequestBody LoansDto loansDto) {
+        logger.info("Updating loan details for loanNumber: {}", loansDto.getLoanNumber());
         boolean isUpdated = iLoansService.updateLoan(loansDto);
         if(isUpdated) {
+            logger.info("Successfully updated loan details for loanNumber: {}", loansDto.getLoanNumber());
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(new ResponseDto(LoansConstants.STATUS_200, LoansConstants.MESSAGE_200));
         }else{
+            logger.warn("Failed to update loan details for loanNumber: {}", loansDto.getLoanNumber());
             return ResponseEntity
                     .status(HttpStatus.EXPECTATION_FAILED)
                     .body(new ResponseDto(LoansConstants.STATUS_417, LoansConstants.MESSAGE_417_UPDATE));
@@ -168,12 +173,15 @@ public class LoansController {
     public ResponseEntity<ResponseDto> deleteLoanDetails(@RequestParam
                                                          @Pattern(regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
                                                          String mobileNumber) {
+        logger.info("Deleting loan details for mobileNumber: {}", mobileNumber);
         boolean isDeleted = iLoansService.deleteLoan(mobileNumber);
         if(isDeleted) {
+            logger.info("Successfully deleted loan details for mobileNumber: {}", mobileNumber);
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(new ResponseDto(LoansConstants.STATUS_200, LoansConstants.MESSAGE_200));
         }else{
+            logger.warn("Failed to delete loan details for mobileNumber: {}", mobileNumber);
             return ResponseEntity
                     .status(HttpStatus.EXPECTATION_FAILED)
                     .body(new ResponseDto(LoansConstants.STATUS_417, LoansConstants.MESSAGE_417_DELETE));

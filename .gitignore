@@ -17,6 +17,7 @@
 
 # Docker database volumes
 /smartbank/
+/grafana-lgtm-data/
 
 # Environment files
 .env
