@@ -18,6 +18,7 @@
 # Docker database volumes
 /smartbank/
 /grafana-lgtm-data/
+/keyclockdata/
 
 # Environment files
 .env
