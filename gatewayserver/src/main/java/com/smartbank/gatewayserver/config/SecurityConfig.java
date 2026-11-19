@@ -31,7 +31,7 @@ public class SecurityConfig {
         return serverHttpSecurity.build();
     }
 
-    private Converter<Jwt, Mono<AbstractAuthenticationToken>> grantedAuthoritiesExtractor() {
+    private Converter<Jwt,Mono<AbstractAuthenticationToken>> grantedAuthoritiesExtractor() {
         JwtAuthenticationConverter jwtAuthenticationConverter =
                 new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter
